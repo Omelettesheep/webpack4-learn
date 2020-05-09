@@ -3,6 +3,7 @@
 - [资源管理](#资源管理)
 - [管理输出](#管理输出)
 - [开发](#开发)
+- [模块热替换](#模块热替换)
 ### 一. <a id="起步">起步</a>
 - webpack默认读src/index.js，打包入dist/main.js
 - webpack默认打包不会删除dist然后重新生成，只会做替换操作
@@ -118,4 +119,46 @@ module.exports = {
 
 - [webpack-dev-middleware](https://www.webpackjs.com/guides/development/#%E4%BD%BF%E7%94%A8-webpack-dev-middleware)
 它可以把 webpack 处理后的文件传递给一个服务器(server)。 webpack-dev-server 在内部使用了它，同时，它也可以作为一个单独的包来使用，以便进行更多自定义设置来实现更多的需求
+
+### 五. <a id="模块热替换">模块热替换</a>
+- 不加载整个网页的情况下，将已更新的模块替换并重新执行一次实现实时预览，默认不开启
+- 基本用法
+```js
+    // 配置
+    devServer: {
+        contentBase: './dist',
+        hot: true // 这里
+    },
+    plugins: [
+     new webpack.NamedModulesPlugin(), // 这里
+     new webpack.HotModuleReplacementPlugin() // 这里
+    ],
+
+    // 使用
+    if(module.hot) {
+    module.hot.accept('./print.js', function() {
+        console.log('Accepting the updated printMe module');
+        // printMe();
+        document.body.removeChild(element);
+        element = component(); // 重新渲染页面后，component 更新 click 事件处理
+        document.body.appendChild(element);
+    })
+}
+```
+- emmm还是有点坑的，如官网[问题](https://www.webpackjs.com/guides/hot-module-replacement/#%E9%97%AE%E9%A2%98)。。。感觉需要意会下，就是在使用中需要一个重新渲染和绑定的过程
+
+- css的热更新（css-loader和style-loader
+
+- 一些[其他的代码和框架](https://www.webpackjs.com/guides/hot-module-replacement/#%E5%85%B6%E4%BB%96%E4%BB%A3%E7%A0%81%E5%92%8C%E6%A1%86%E6%9E%B6)
+
+    [React Hot Loader](https://github.com/gaearon/react-hot-loader)：实时调整 react 组件。
+
+- 本章节待学习项目
+
+    [概念 - 模块热替换(Hot Module Replacement)](https://www.webpackjs.com/concepts/hot-module-replacement/)
+
+    [API - 模块热替换(Hot Module Replacement)](https://www.webpackjs.com/api/hot-module-replacement/)
+
+
+
 
