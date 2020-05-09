@@ -2,6 +2,7 @@
 - [起步](#起步)
 - [资源管理](#资源管理)
 - [管理输出](#管理输出)
+- [开发](#开发)
 ### 一. <a id="起步">起步</a>
 - webpack默认读src/index.js，打包入dist/main.js
 - webpack默认打包不会删除dist然后重新生成，只会做替换操作
@@ -75,3 +76,46 @@ module.exports = {
 [缓存指南](https://www.webpackjs.com/guides/caching/)
 
 [代码分离指南](https://www.webpackjs.com/guides/code-splitting/)
+
+### 四. <a id="开发">开发</a>
+1. [source map](https://www.webpackjs.com/configuration/devtool/)
+当 webpack 打包源代码时，如果将三个源文件（a.js, b.js 和 c.js）打包到一个 bundle中，而其中一个源文件包含一个错误，那么堆栈跟踪就会简单地指向到 bundle.js。source map功能将编译后的代码映射回原始源代码。
+```
+// 待学习
+"source map需要细看"
+```
+2. 代码发生变化后自动编译代码：
+- webpack's Watch Mode （会自动重新编译，但是不会帮助刷新浏览器，如果你没有自己起服务的话
+```js
+// 然鹅我没有重新生成html，是因为用了CleanWebpackPlugin这个插件，webpack误以为html没有用，从dist里删除了
+
+// package.json文件中
+"scripts": {
+    "watch": "webpack --watch", // 这里
+    "build": "webpack"
+  },
+```
+- [webpack-dev-server](https://www.webpackjs.com/configuration/dev-server/)细节看官方文档
+```js
+// 安装
+npm install --save-dev webpack-dev-server
+// 配置
+module.exports = {
+    entry: {
+        app: './src/app.js',
+        print: './src/print.js',
+    },
+    devtool: 'inline-source-map',
+    devServer: { // 这里
+        contentBase: './dist'
+    },
+    ......
+};
+```
+这边又遇到了一个版本问题，https://github.com/webpack/webpack-dev-server/issues/2029
+
+原因是[webpack-cli](https://www.npmjs.com/package/webpack-cli)和webpack-dev-server会有不兼容，不要4.x.x的webpack-cli，它还在deta阶段.
+
+- [webpack-dev-middleware](https://www.webpackjs.com/guides/development/#%E4%BD%BF%E7%94%A8-webpack-dev-middleware)
+它可以把 webpack 处理后的文件传递给一个服务器(server)。 webpack-dev-server 在内部使用了它，同时，它也可以作为一个单独的包来使用，以便进行更多自定义设置来实现更多的需求
+
