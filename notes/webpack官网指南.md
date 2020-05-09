@@ -1,8 +1,10 @@
 ###  [webpack官网指南](https://www.webpackjs.com/guides/ "webpack指南")
+学到一半发现中文文档实在是太旧了，跟着[英文文档](https://webpack.js.org/guides/tree-shaking/#mark-the-file-as-side-effect-free)来吧
 - [起步](#起步)
 - [资源管理](#资源管理)
 - [管理输出](#管理输出)
 - [开发](#开发)
+- [代码分割](#代码分割)
 - [模块热替换](#模块热替换)
 ### 一. <a id="起步">起步</a>
 - webpack默认读src/index.js，打包入dist/main.js
@@ -120,7 +122,55 @@ module.exports = {
 - [webpack-dev-middleware](https://www.webpackjs.com/guides/development/#%E4%BD%BF%E7%94%A8-webpack-dev-middleware)
 它可以把 webpack 处理后的文件传递给一个服务器(server)。 webpack-dev-server 在内部使用了它，同时，它也可以作为一个单独的包来使用，以便进行更多自定义设置来实现更多的需求
 
-### 五. <a id="模块热替换">模块热替换</a>
+### 五. <a id="代码分割">代码分割</a>——代码分割+按需加载
+> 本章节 安装了webpack-bundle-analyzer来观察打包结果
+
+1. 从入口处分离
+    
+    ```js
+        entry: {
+        app: './src/app.js',
+        another: './src/another-module.js'
+    },
+    ```
+    优点：最简单和直观
+
+    缺点：（1）重复模块会被重复打包（2）不能将核心的应用程序逻辑进行动态的代码拆分
+
+    下图是打包结果，可以看到Lodash被重复打包了
+    ![entry point](https://pic.rmb.bdstatic.com/1f0ea7dc1ad368e72eef4e521e94260e.png "entry point重复打包")
+
+    下一步就是利用splitChunksPlugin进行去重
+
+2. 去重: 
+
+    （1）5.x.x的版本新增了一个dependOn，不过我现在用的4，而且5还在deta版本, 用法大概是下面酱
+    ![dependOn](https://pic.rmb.bdstatic.com/60e7cc0e559a4dbea644f977d741cd6f.png "dependOn")
+
+    （2）利用SplitChunksPlugin（3.x 是CommonsChunkPlugin）去重和分离chunk
+
+    可以把公共依赖提取到其中一个有依赖的chunk中，或者提取到一个新chunk中
+    ```js
+     optimization: {
+        splitChunks: {
+            chunks: 'all'
+        }
+    },
+
+    ```
+    从下图可以看到lodash被单独提取成一个包
+    ![splitChunksPlugin去重后](https://pic.rmb.bdstatic.com/5295c790b6c757de291b9b54c7d48cd9.png "splitChunksPlugin去重后")
+
+    （3）一些其他loader
+
+    [mini-css-extract-plugin](https://webpack.js.org/plugins/mini-css-extract-plugin): 分离css(3.x用的ExtractTextPlugin)
+
+    [bundle-loader](https://webpack.js.org/loaders/bundle-loader/)、promise-loader:用于分离代码和延迟加载生成的 bundle
+
+
+3. 动态导入：通过模块的内联函数调用来分离代码import()、require.ensure.
+
+### 六. <a id="模块热替换">模块热替换</a>
 - 不加载整个网页的情况下，将已更新的模块替换并重新执行一次实现实时预览，默认不开启
 - 基本用法
 ```js

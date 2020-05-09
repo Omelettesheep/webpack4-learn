@@ -1,11 +1,13 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 // const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
     entry: {
         app: './src/app.js',
+        another: './src/another-module.js',
     },
     devtool: 'inline-source-map',
     devServer: {
@@ -13,6 +15,7 @@ module.exports = {
         hot: true
     },
     plugins: [
+        new BundleAnalyzerPlugin(),
         // new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'Output Management'
@@ -23,6 +26,11 @@ module.exports = {
     output: {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist')
+    },
+    optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
     },
     module: {
         rules: [
