@@ -169,6 +169,49 @@ module.exports = {
 
 
 3. 动态导入：通过模块的内联函数调用来分离代码import()、require.ensure.
+    - chunkFilename: 定义了不在entry写的文件的输出名称
+    ```js
+        filename: '[name].bundle.js',
+        chunkFilename: '[name].bundle.js', // 这里
+        },
+    ```
+
+    - 动态导入部分
+    ```js
+    // 这边使用了default是从4开始，导入commonjs Module的时候，import不再解析module.exports的值，而是会创建一个命名空间，可参考 https://medium.com/webpack/webpack-4-import-and-commonjs-d619d626b655
+    // 下面的写法也可换用async和await
+    function getComponent() {
+        return import(/* webpackChunkName: "lodash" */ 'lodash').then(({default: _}) => {
+            const element = document.createElement('div');
+            element.innerHTML = _.join(['Hello', 'webpack'], ' ');
+            return element;
+
+    }).catch(err => 'An error occurred while loading the component');
+    }
+    ```
+
+    - 结果依然符合预期
+    ![动态导入分包](https://pic.rmb.bdstatic.com/6f54e3bdce33600fb4de7eac3254a7fb.png "动态导入分包")
+
+4. 预加载（webpack4.6.0+）
+```
+import(/* webpackPrefetch: true */ 'LoginModal');
+
+import(/* webpackPreload: true */ 'ChartingLibrary');
+```
+
+5. bundle分析
+
+    webpack-chart:webpack 数据交互饼图。
+
+    webpack-visualizer:可视化并分析你的 bundle
+
+    webpack-bundle-analyzer: bundle 内容的插件及 CLI
+
+    webpack bundle optimize helper:分析bundle并给出建议
+
+    bundle-stats:比较两次build之间的差异
+
 
 ### 六. <a id="模块热替换">模块热替换</a>
 - 不加载整个网页的情况下，将已更新的模块替换并重新执行一次实现实时预览，默认不开启
