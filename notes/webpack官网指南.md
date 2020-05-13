@@ -6,6 +6,8 @@
 - [开发](#开发)
 - [代码分割](#代码分割)
 - [缓存](#缓存)
+- [创建library](#创建library)
+- [环境变量](#环境变量)
 - [模块热替换](#模块热替换)
 ### 一. <a id="起步">起步</a>
 - webpack默认读src/index.js，打包入dist/main.js
@@ -256,8 +258,12 @@ output: [name].[contenthash].js
     - 待确认：chunkfilename和filename同时存在时，优先级是什么，哪些读chunkfilename，哪些读filename
 
 
-
-### 七. <a id="模块热替换">模块热替换</a>
+### 七. <a id="创建library">创建library</a>
+本章节我暂时用不到，先跳过叭
+### 八. <a id="环境变量">环境变量</a>
+- 要使用环境变量需要把modules.exports从对象变成一个函数
+![https://pic.rmb.bdstatic.com/8a0d7e204e8924e025d6d72b74cfd3b9.png](https://pic.rmb.bdstatic.com/8a0d7e204e8924e025d6d72b74cfd3b9.png)
+### 九. <a id="模块热替换">模块热替换</a>
 - 不加载整个网页的情况下，将已更新的模块替换并重新执行一次实现实时预览，默认不开启
 - 基本用法
 ```js
