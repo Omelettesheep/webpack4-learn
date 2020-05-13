@@ -5,6 +5,7 @@
 - [管理输出](#管理输出)
 - [开发](#开发)
 - [代码分割](#代码分割)
+- [缓存](#缓存)
 - [模块热替换](#模块热替换)
 ### 一. <a id="起步">起步</a>
 - webpack默认读src/index.js，打包入dist/main.js
@@ -212,8 +213,51 @@ import(/* webpackPreload: true */ 'ChartingLibrary');
 
     bundle-stats:比较两次build之间的差异
 
+### 六. <a id="缓存">缓存</a>
+> （1）文件不更新，读缓存；（2）文件更新，确保能够获取新的请求
+- 修改output的文件名, ```contenthash```包含文件的hash（注：contenthash和旧版本的hmr不兼容）
+```
+output: [name].[contenthash].js
+```
 
-### 六. <a id="模块热替换">模块热替换</a>
+- 提取模板 
+    1. runtime ```optimization.runtimeChunk ```
+    2. lib包，把react, lodash等不常用的包打入ventor 
+    ```
+    optimization: {
+        runtimeChunk: 'single',
+        splitChunks: {
+            cacheGroups: { // 这里
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                },
+            },
+        },
+    },
+    ```
+    3. 模块之间用id表示依赖，如果某个业务文件变了，ventor对其有依赖，也会跟着变hash，这不是我们期望的，因为ventor中的内容应该是不变的。所以添加模块标识符配置（在3.x中可能需要使用``` NamedModulesPlugin```插件）
+    ```
+    optimization: {
+        moduleIds: 'hashed', // 这里
+        runtimeChunk: 'single',
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                },
+            },
+        },
+    },
+    ```
+    - 待确认：chunkfilename和filename同时存在时，优先级是什么，哪些读chunkfilename，哪些读filename
+
+
+
+### 七. <a id="模块热替换">模块热替换</a>
 - 不加载整个网页的情况下，将已更新的模块替换并重新执行一次实现实时预览，默认不开启
 - 基本用法
 ```js
